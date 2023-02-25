@@ -85,7 +85,12 @@ def parse_to_array(all_values_from_file):
 	return items
 
 
-def generate_tables(rr): #funkcja genrująca tablice danych 
+def generate_tables(rr):
+	"""
+	Generating table of ordered data
+	:param rr:
+	:return:
+	"""
 
 	global E
 	E = rr[0][0]
@@ -159,7 +164,10 @@ Global variables meaning:
 
 
 def display():
-
+	"""
+	Displaying ordered data
+	:return:
+	"""
 	print()
 	print("Link number E: %s" % E)
 	for i in range(1,E+1):
