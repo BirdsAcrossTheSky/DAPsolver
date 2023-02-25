@@ -38,59 +38,72 @@ def rm_empty_str(lst):
 	return lst
 
 
-
 def separate(table, i, j):
-	# rozróżnia liczby odseparowane spacjami z podanej tablicy
-	vect = []
+	"""
+	extracting numbers from strings and change it to integers
+
+	Params: table (list of strings)
+			i (index 1)
+			j (index 2)
+
+	Returns: int(c) (int)
+			 j (int)
+	"""
 	c = table[i][j]
-	while j+1 < len(table[i]) and table[i][j+1] != ' ':
-		c=c+table[i][j+1]		
-		j=j+1	
-	
-	return int(c), j			
+	while j + 1 < len(table[i]) and table[i][j + 1] != ' ':
+		c = c + table[i][j + 1]
+		j = j + 1
+
+	return int(c), j
 
 
+def parse_to_array(all_values_from_file):
+	"""
+	transforming list of strings of numbers into list of list that contain numbers, which were part of those strings
 
-def parse_to_array(all_values_from_file): 	#funkcja zwraca dwuwymiarową tablicę liczb items[i][j], gdzie i - wiersz z pliku, j - kolejna liczba w linii
-	items=[]
-	vect=[]
-	i=0
-	
-	while(i<len(all_values_from_file)):
-		j=0
-		while (j<len(all_values_from_file[i])):			
-			if(all_values_from_file[i][j]!=' '):
-				vect.append(separate(all_values_from_file,i,j)[0])
-				j=separate(all_values_from_file,i,j)[1]+1
+	Params: all_values_from_file (list of strings)
+
+	Returns: items (list of lists)
+	"""
+	items = []
+	vect = []
+	i = 0
+
+	while i < len(all_values_from_file):
+		j = 0
+
+		while j < len(all_values_from_file[i]):
+			if all_values_from_file[i][j] != ' ':
+				vect.append(separate(all_values_from_file, i, j)[0])
+				j = separate(all_values_from_file, i, j)[1] + 1
 			else:
-				j=j+1
-		i=i+1
-		items.append(vect)		
-		vect=[]
-	
+				j += 1
+		i += 1
+		items.append(vect)
+		vect = []
+
 	return items
-	
 
 
 def generate_tables(rr): #funkcja genrująca tablice danych 
 
 	global E
-	E=rr[0][0]
+	E = rr[0][0]
 	global D
-	D=rr[E+1][0]
+	D = rr[E+1][0]
 	global E_table
 	E_table = []
 	global Ce
 	Ce = []
-	for i in range(1,E+1):
+	for i in range(1, E+1):
 		Ce.append(rr[i][3])
 		E_table.append(rr[i])
 	
 	global d_ind
-	d_ind=[]
+	d_ind = []
 	global p_ind
-	p_ind=[]
-	P_start_ind=[]
+	p_ind = []
+	P_start_ind = []
 	d_ind.append(E+2)
 	p_ind.append(d_ind[0]+1)
 	P_start_ind.append(d_ind[0]+2)
@@ -111,49 +124,52 @@ def generate_tables(rr): #funkcja genrująca tablice danych
 		hd.append(rr[d_ind[j]][3])
 		p_cnt.append(rr[p_ind[j]][0])
 
-	link=[]
-	links=[]
+	link = []
+	links = []
 	global all_links
-	all_links=[] #Tablica krawędzi wchodzących w skład wszystkich ścieżek
-	for z in range(D): #petla po każdym zapotrzebowaniu
-		i=0
-		while(i<rr[p_ind[z]][0]): #pętla po kazdej ze ścieżek zapotrzebowania
-			for k in rr[P_start_ind[z]+i][1:]:	#pętla po każdej wartosci danej ścieżki
+	all_links = []  # Table of links of all paths
+	for z in range(D):  # Loop on every demand
+		i = 0
+		while i < rr[p_ind[z]][0]:  # Loop on every demand's path
+			for k in rr[P_start_ind[z]+i][1:]:	 # Value of path loop
 				link.append(k)
 			links.append(link)
-			link=[]
-			i=i+1
+			link = []
+			i += 1
 		all_links.append(links)
-		links=[]
-    #all_links[x][y][z] format: all_links[numer zapotrzebowania - 1] [numer ścieżki zapotrzebowania - 1] [numer krawędzi w ścieżce - 1]
+		links = []
+
+	# all_links[x][y][z] format: all_links[demand number- 1] [path number - 1] [link number - 1]
 	return
 
-# Globalne dane z funkcji generate:
-''' SKRÓTY:
- E - Liczba krawędzi
- D - Liczba zapotrzebowań
- Ce - Pojemności krawędzi
- hd - pojemności zapotrzebowania
- d_ind - Indeksy zapotrzebowania odpowiadające zapisowi w pliku z danymi
- p_ind - Indeksy ścieżek odpowiadające zapisowi w pliku z danymi
- p_cnt - Liczby ścieżek dla danego zapotrzebowania
- all_links - Tablica ścieżek
- E_table - Tablica danych krawędzi
- D_table - Tablica danych zapotrzebowań
+
+''' 
+Global variables meaning:
+ E - Links number
+ D - Demnand number
+ Ce - Link capacity
+ hd - Demand capacity
+ d_ind - Indexes of demands in file 
+ p_ind - Indexes of paths in file
+ p_cnt - Number of paths for demand
+ all_links - Table of paths
+ E_table - Table of links
+ D_table - Table of demands
 '''
 
 
 def display():
+
 	print()
-	print("Liczba krawędzi E: %s" % E)
+	print("Link number E: %s" % E)
 	for i in range(1,E+1):
 		print("e:%s, node_1: %s , node_2: %s, C(e): %s" % (rr[i][0], rr[i][1], rr[i][2], rr[i][3]))
 	print()
-	print("Liczba zapotrzebowań D: %s" % D)
+	print("Demand number D: %s" % D)
 	for j in range(D):
 		print("d:%s, node_1: %s , node_2: %s, h(d): %s" % (rr[d_ind[j]][0], rr[d_ind[j]][1], rr[d_ind[j]][2], rr[d_ind[j]][3]))
 	print()
-	print("Tablica ścieżek P(): ")
+	print("Path table P(): ")
 	print(all_links)
 	print()
 
@@ -388,11 +404,12 @@ def present_chromosome2(x):
             #continue
         print("\n\n")
 
+
 start_time = time.time()
-lines_from_file=[]	
-lines_from_file=read_file("network_files/net12_2_for_python_1.txt")
-r=list(filter(None,lines_from_file))
-rr=parse_to_array(r)
+lines_from_file = read_file("network_files/net12_2_for_python_1.txt")
+# r = [*filter(None, lines_from_file)]
+
+rr = parse_to_array(lines_from_file)
 #print(rr) # Wyświetlenie tablicy danych odczytanych z pliku
 generate_tables(rr)
 #display() #Przystępne wyświetlenie najważniejszych danych odczytanych z pliku
