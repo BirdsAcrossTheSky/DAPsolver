@@ -3,14 +3,44 @@ from operator import itemgetter
 import time
 
 
+def func_timer(func):
+	"""
+	Measure duration of function
+
+	:param func:
+	:return:
+	"""
+	def wrapper(*args, **kwargs):
+		t0 = time.time()
+		rslt = func(*args, **kwargs)
+		t = time.time() - t0
+		print("Duration of {} was {}s.".format(func.__name__, t))
+		return rslt
+	return wrapper
+
+
+def func_counter(func):
+	"""
+	count number of times function was used
+
+	:param func:
+	:return:
+	"""
+	def wrapper(*args, **kwargs):
+		wrapper.cnt += 1
+		return func(*args, **kwargs)
+	wrapper.cnt = 0
+	return wrapper
+
+
+@func_timer
 def read_file(file_name):
 	"""
-	transforming file lines into list of strings and removing redundant contents of generated list (like comments,
+	transform file lines into list of strings and remove redundant contents of generated list (like comments,
 	empty lines, spaces)
 
-	params: file_name (string)
-
-	returns: str_of_nums_list
+	:param file_name: string
+	:return: str_of_nums_list
 	"""
 
 	lines = []
@@ -24,6 +54,7 @@ def read_file(file_name):
 	return str_of_nums_list
 
 
+@func_timer
 def rm_empty_str(lst):
 	"""
 	removing empty strings from list, that came from empty lines in doc
@@ -285,6 +316,8 @@ def initialize_with_0(n):
 		generation.append(generate_x_of_0())
 	return generation
 
+
+@func_counter
 def crossover(p1, p2):
     o1 = []
     o2 = []
@@ -325,7 +358,7 @@ def mutate2(x): # Mutacja polegająca na wylosowaniu nowego genu losowego chromo
 		if p_cnt[i] == 1: # OBSERWUJ TO
 			break
 		x_rand = generate_ran_x2()
-	x[i] = x_rand[i] # napisać analogiczną bądź inną dedykowaną funkcje dla pojedyńczego genu
+	x[i] = x_rand[i] # napisać analogiczną bądź inną dedykowaną funkcje dla pojedyńczego genu
 	return
 
 def mutate22(x):
@@ -400,7 +433,9 @@ def present_chromosome(x):
             #continue
         print("\n\n")
 
+
 def present_chromosome2(x):
+
     print()
     for i in range(max(p_cnt)):
         for j in range(D):
@@ -408,9 +443,8 @@ def present_chromosome2(x):
                 print("", x[j][i], end = "")
             except IndexError:
                 print(" -", end = "")
-                #x[j][i] = '-'
-            #continue
         print("\n\n")
+
 
 
 start_time = time.time()
@@ -581,6 +615,7 @@ for i in range(n):
 	
 
 print("Czas wykonania: {:.2f}s".format(time.time() - start_time))
+print("Funkcja crossover została wykonan {} razy.".format(crossover.cnt))
 
 
 
