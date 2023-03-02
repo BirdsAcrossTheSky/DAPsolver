@@ -321,6 +321,11 @@ gen_ran_x = [generate_ran_x1, generate_ran_x2, generate_ran_x3]
 
 
 def generate_x_of_0():
+	"""
+	generate chromosome of 0s
+
+	:return:
+	"""
 	x = []
 	y = []
 	for i in range(D):
@@ -362,7 +367,7 @@ def initialize2(n):
 
 def initialize_with_0(n):
 	"""
-	generate population of 0s
+	generate population of 0 chromosomes
 
 	:param n:
 	:return:
@@ -376,11 +381,12 @@ def initialize_with_0(n):
 @func_counter
 def crossover(p1, p2):
 	"""
-
+	create two chromosomes with genes randomly drawn from its parents (arguments)
 
 	:param p1:
 	:param p2:
-	:return:
+	:return o1:
+	:return o1:
 	"""
 	o1 = []
 	o2 = []
@@ -399,77 +405,106 @@ def crossover(p1, p2):
 
 	return o1, o2
 
+
 def mutate(x):
+	"""
+
+
+	:param x:
+	:return:
+	"""
 	i = random.randrange(D)
-	while hd[i] == 0: # Zabezpieczenie przed hd = 0
+	while hd[i] == 0:  # for hd = 0 case
 		i = random.randrange(D)
 	j = random.randrange(p_cnt[i])
-	while x[i][j] == 0: # Zabezpieczenie przed przeniesieniem zasobu z miejsca gdzie go nie ma
+	while x[i][j] == 0:  # to avoid taking demand from where there is none
 		j = random.randrange(p_cnt[i])
 	x[i][j] -= 1
 	k = random.randrange(p_cnt[i])
-	while k == j: # Zabezpieczenie przed przeniesieniem zasobu do miejsca z którego został on wzięty
+	while k == j:  # to avoid come back of a demand to same place it's been taken from
 		k = random.randrange(p_cnt[i])
 	x[i][k] += 1
 
 	return
 
-def mutate2(x): # Mutacja polegająca na wylosowaniu nowego genu losowego chromosomu
+
+def mutate2(x):
+	"""
+	Generate random chromosome in place of randomly chosen existing one
+
+	:param x:
+	:return:
+	"""
 	i = random.randrange(D)
 	x_rand = generate_ran_x2()
 	while x_rand[i] == x[i]:
-		if p_cnt[i] == 1: # OBSERWUJ TO
+		if p_cnt[i] == 1:
 			break
 		x_rand = generate_ran_x2()
-	x[i] = x_rand[i] # napisać analogiczną bądź inną dedykowaną funkcje dla pojedyńczego genu
+	x[i] = x_rand[i]  # create similar function for gene?
 	return
 
+
 def mutate22(x):
+	"""
+	Generate random chromosome in place of randomly chosen existing one
+
+
+	:param x:
+	:return:
+	"""
 	x_rand = generate_ran_x2()	
 	for i in range(D):
 		r_mut_gen = random.randrange(mut_rate)
 		if r_mut_gen == 0:
 			while x_rand[i] == x[i]:
-				if p_cnt[i] == 1: # OBSERWUJ TO
+				if p_cnt[i] == 1:
 					break
 				x_rand = generate_ran_x2()
 			x[i] = x_rand[i]
 	return
 
+
 def index_list(population_n): # Funkcja obliczająca F(x) populacji i zapisująca indeks
-		Fx1 = [] # [numer chromosomu w populacji][0 - indeks, 1 - Fx]
+	"""
+	Generate list of Fx for chromosomes of population, sort it and assign indexes NOT OPTIMAL
+
+	:param population_n:
+	:return:
+	"""
+	Fx1 = [] # [number of chromosome in population][0 - index, 1 - Fx]
+	Fx_ind = []
+	for i in range(len(population_n)):
+		Fx_ind.append(i)  # index assignment
+		Fx_ind.append(evaluate(population_n[i]))  # F(x) assignment
+		Fx1.append(Fx_ind)
 		Fx_ind = []
-		for i in range(len(population_n)):
-			Fx_ind.append(i) #przydzielenie indeksu
-			Fx_ind.append(evaluate(population_n[i])) #przydzielenie F(x)
-			Fx1.append(Fx_ind)
-			Fx_ind = []
-		return Fx1
+	return Fx1
 
 
-def sort_index(population_n): # Funkcja sortująca indeksy chromosomów od tych odpowidających najmniejszemu F(x)
-	# do odpowiadających F(x) największemu		population_n = population[n]
-	# Fx_sorted: [[indeks_best, Fx_best][indeks_second_best, Fx_second_best]...]
+def sort_index(population_n):
+	"""
+	sort pairs Fx-index by Fx
 
+	:param population_n:
+	:return:
+	"""
 	Fx_sorted = sorted(index_list(population_n), key=itemgetter(1))
+	# Fx_sorted: [[index_best, Fx_best][index_second_best, Fx_second_best]...]
 	return Fx_sorted
 
 
 def merge_index(Fx1, Fx2):
-	for i in range(len(Fx1)): # Dodaje drugi index o wartości 0 jezeli chromosom ze zbioru podstawowego
-		Fx1[i].append(0)
-	for j in range(len(Fx2)): # Dodaje drugi index o wartości 1 jezeli chromosom ze zbioru O(n)
-		Fx2[j].append(1)
-	#print("[INDEKS,	 F(X),	 0 DLA P(N) LUB 1 DLA O(N)]")
-	#print("P(n):		", Fx1)
-	#print("O(n):		", Fx2)
+	for i in range(len(Fx1)):
+		Fx1[i].append(0)  # Add another index equal to 0 if chromosome is from population
+	for j in range(len(Fx2)):
+		Fx2[j].append(1)  # Add another index equal to 1 if chromosome is from ser\t O(x)
+
 	# Sorted z którego korzystamy jest sortowaniem stabilnym, zatem zachowującym kolejność. Oznacza to, że kolejność dodawania list ma znaczenie. 
 	# Aby zwiększyć udział potomków w populacji lista indeksów zbioru O(x) powinna być zapisana przed znakiem dodawania
 	Fx12 = Fx2 + Fx1
-	Fx3 = sorted(Fx12, key = itemgetter(1))
-	#print("O(n) + P(n):	", Fx3)
+	Fx3 = sorted(Fx12, key=itemgetter(1))
 	Fx_merged = Fx3[:len(Fx1)]
-	#print("P(n+1):		", Fx_merged)
 
 	return Fx_merged
 
