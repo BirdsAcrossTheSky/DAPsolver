@@ -73,19 +73,19 @@ def separate(table, i, j):
 	"""
 	extracting numbers from strings and change it to integers
 
-	Params: table (list of strings)
-			i (index 1)
-			j (index 2)
-
-	Returns: int(c) (int)
-			 j (int)
+	:param table:
+	:param i:
+	:param j:
+	:return c:
+	:return j:
 	"""
 	c = table[i][j]
 	while j + 1 < len(table[i]) and table[i][j + 1] != ' ':
 		c = c + table[i][j + 1]
 		j = j + 1
+	c = int(c)
 
-	return int(c), j
+	return c, j
 
 
 def parse_to_array(all_values_from_file):
@@ -118,7 +118,8 @@ def parse_to_array(all_values_from_file):
 
 def generate_tables(rr):
 	"""
-	Generating table of ordered data
+	Generating tables of ordered data to global scope
+
 	:param rr:
 	:return:
 	"""
@@ -180,7 +181,7 @@ def generate_tables(rr):
 
 
 ''' 
-Global variables meaning:
+Global variables legend:
  E - Links number
  D - Demnand number
  Ce - Link capacity
@@ -198,11 +199,11 @@ def display():
 	"""
 	Displaying ordered data
 
-	:return:
+	:return Fx: int
 	"""
 	print()
 	print("Link number E: %s" % E)
-	for i in range(1,E+1):
+	for i in range(1, E+1):
 		print("e:%s, node_1: %s , node_2: %s, C(e): %s" % (rr[i][0], rr[i][1], rr[i][2], rr[i][3]))
 	print()
 	print("Demand number D: %s" % D)
@@ -215,9 +216,14 @@ def display():
 
 	return
 
-def evaluate(x): #Funkcja obliczająca F(x) dla chromosomu x
-	
-	load = [] #przepływ przez krawędź n+1 l(e,x)
+def evaluate(x):
+	"""
+	Function calculating objection function of evaluated chromosome
+
+	:param x:
+	:return fx:
+	"""
+	load = []  # load of a link n+1 l(e,x)
 	for i in range(E):
 		load.append(0)
 		for j in range(D):
@@ -225,31 +231,36 @@ def evaluate(x): #Funkcja obliczająca F(x) dla chromosomu x
 				for l in all_links[j][k]:
 					if i+1 == l:
 						load[i] += x[j][k]
-	Y = [] # Overload
+	y = [] # Overload
 	for i in range (E):
-		Y.append(load[i] - Ce[i])
+		y.append(load[i] - Ce[i])
 
-	Fx = max(Y)
-	return Fx
+	fx = max(y)
+	return fx
+
 
 def random_number(z):
 	"""
 	generate random number from range [0 - z]
 
 	:param z:
-	:return:
+	:return x:
 	"""
-	#if z < 0: # pomaga wykryć niepoprawne użycie
-	#	print("NIEPOPRAWNY ARGUMENT (z < 0) FUNKCJI random_number(z)")
-	#	return
+
 	x = random.randrange(0, z+1)
 	return x
 
-def generate_ran_x1(): #Funkcja generująca losowy chromosom
+
+def generate_ran_x1():
+	"""
+	generate random chromosome 1
+
+	:return x: list of lists
+	"""
 	x = []
 	y = []
 	for i in range(D):
-		hd_used = 0 # Zapotrzebowanie wykorzystane na poprzednie ścieżki
+		hd_used = 0 # Demand used on previous paths
 		for j in range(p_cnt[i]):
 			if j == p_cnt[i] - 1:
 				y.append(hd[i] - hd_used)
@@ -263,6 +274,11 @@ def generate_ran_x1(): #Funkcja generująca losowy chromosom
 
 
 def generate_ran_x2():
+	"""
+	generate random chromosome 2
+
+	:return x:
+	"""
 	x = []
 	y = []
 	for i in range(D):
@@ -276,13 +292,18 @@ def generate_ran_x2():
 	return x
 
 
-def generate_ran_x3(): #Funkcja generująca losowy chromosom
+def generate_ran_x3():
+	"""
+	generate random chromosome 3
+
+	:return x:
+	"""
 	x = []
 	y = []
 	for i in range(D):
 		r = random.randrange(D)
-		ri = (r+i)%D # Funkcja losuje od którego genu zaczyna przydzielanie
-		hd_used = 0 # Zapotrzebowanie wykorzystane na poprzednie ścieżki
+		ri = (r+i)%D  # randomize starting gene
+		hd_used = 0  # Demand used on previous path
 		for j in range(p_cnt[i]):
 			if j == p_cnt[ri] - 1:
 				y.append(hd[ri] - hd_used)
@@ -309,13 +330,27 @@ def generate_x_of_0():
 		y = []
 	return x
 
-def initialize(n): # Funkcja tworząca generacje chromosomów w sposób losowy
-    generation0 = []
-    for i in range(n):
-        generation0.append(gen_ran_x[1]())
-    return generation0
 
-def initialize2(n): # Funkcja tworząca generacje chromosomów w sposób losowy
+def initialize(n):
+	"""
+	generate random population
+
+	:param n:
+	:return generation0:
+	"""
+	generation0 = []
+	for i in range(n):
+		generation0.append(gen_ran_x[1]())
+	return generation0
+
+
+def initialize2(n):
+	"""
+	generate random population
+
+	:param n:
+	:return generation0:
+	"""
 	generation0 = []
 	a = int(n/2)
 	for i in range(a):
@@ -324,7 +359,14 @@ def initialize2(n): # Funkcja tworząca generacje chromosomów w sposób losowy
 		generation0.append(gen_ran_x[1]())
 	return generation0
 
+
 def initialize_with_0(n):
+	"""
+	generate population of 0s
+
+	:param n:
+	:return:
+	"""
 	generation = []
 	for i in range(n):
 		generation.append(generate_x_of_0())
@@ -333,22 +375,29 @@ def initialize_with_0(n):
 
 @func_counter
 def crossover(p1, p2):
-    o1 = []
-    o2 = []
-    for i in range(D):
-        r1 = random_number(1)
-        r2 = random_number(1)
-        if r1 == 0:
-            o1.append(p1[i])
-        else:
-            o1.append(p2[i])
-    
-        if r2 == 0:
-            o2.append(p1[i])
-        else:
-            o2.append(p2[i])
+	"""
 
-    return o1, o2
+
+	:param p1:
+	:param p2:
+	:return:
+	"""
+	o1 = []
+	o2 = []
+	for i in range(D):
+		r1 = random_number(1)
+		r2 = random_number(1)
+	if r1 == 0:
+		o1.append(p1[i])
+	else:
+		o1.append(p2[i])
+
+	if r2 == 0:
+		o2.append(p1[i])
+	else:
+		o2.append(p2[i])
+
+	return o1, o2
 
 def mutate(x):
 	i = random.randrange(D)
