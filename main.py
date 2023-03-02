@@ -7,8 +7,8 @@ def func_timer(func):
 	"""
 	Measure duration of function
 
-	:param func:
-	:return:
+	:param func: function that we want to time every time its executed
+	:return: function with a timing mechanism
 	"""
 	def wrapper(*args, **kwargs):
 		t0 = time.time()
@@ -23,8 +23,8 @@ def func_counter(func):
 	"""
 	count number of times function was used
 
-	:param func:
-	:return:
+	:param func: function which number of executions we want to know
+	:return: function with counting mechanism
 	"""
 	def wrapper(*args, **kwargs):
 		wrapper.cnt += 1
@@ -197,6 +197,7 @@ Global variables meaning:
 def display():
 	"""
 	Displaying ordered data
+
 	:return:
 	"""
 	print()
@@ -231,14 +232,20 @@ def evaluate(x): #Funkcja obliczająca F(x) dla chromosomu x
 	Fx = max(Y)
 	return Fx
 
-def random_number(z): # Funkcja generująca losową liczbę całkowitą z zakresu [0 - z]
+def random_number(z):
+	"""
+	generate random number from range [0 - z]
+
+	:param z:
+	:return:
+	"""
 	#if z < 0: # pomaga wykryć niepoprawne użycie
 	#	print("NIEPOPRAWNY ARGUMENT (z < 0) FUNKCJI random_number(z)")
 	#	return
 	x = random.randrange(0, z+1)
 	return x
 
-def generate_ran_x(): #Funkcja generująca losowy chromosom
+def generate_ran_x1(): #Funkcja generująca losowy chromosom
 	x = []
 	y = []
 	for i in range(D):
@@ -254,23 +261,6 @@ def generate_ran_x(): #Funkcja generująca losowy chromosom
 
 	return x
 
-def generate_ran_x3(): #Funkcja generująca losowy chromosom
-	x = []
-	y = []
-	for i in range(D):
-		r = random.randrange(D)
-		ri = (r+i)%D # Funkcja losuje od którego genu zaczyna przydzielanie 
-		hd_used = 0 # Zapotrzebowanie wykorzystane na poprzednie ścieżki
-		for j in range(p_cnt[i]):
-			if j == p_cnt[ri] - 1:
-				y.append(hd[ri] - hd_used)
-			else:
-				y.append(random_number(hd[ri] - hd_used))
-				hd_used += y[j]
-		x.append(y)
-		y = []
-
-	return x
 
 def generate_ran_x2():
 	x = []
@@ -285,6 +275,30 @@ def generate_ran_x2():
 		y = []
 	return x
 
+
+def generate_ran_x3(): #Funkcja generująca losowy chromosom
+	x = []
+	y = []
+	for i in range(D):
+		r = random.randrange(D)
+		ri = (r+i)%D # Funkcja losuje od którego genu zaczyna przydzielanie
+		hd_used = 0 # Zapotrzebowanie wykorzystane na poprzednie ścieżki
+		for j in range(p_cnt[i]):
+			if j == p_cnt[ri] - 1:
+				y.append(hd[ri] - hd_used)
+			else:
+				y.append(random_number(hd[ri] - hd_used))
+				hd_used += y[j]
+		x.append(y)
+		y = []
+
+	return x
+
+
+# list of functions generating random chromosomes, functions differ with a way they generate chromosome
+gen_ran_x = [generate_ran_x1, generate_ran_x2, generate_ran_x3]
+
+
 def generate_x_of_0():
 	x = []
 	y = []
@@ -298,16 +312,16 @@ def generate_x_of_0():
 def initialize(n): # Funkcja tworząca generacje chromosomów w sposób losowy
     generation0 = []
     for i in range(n):
-        generation0.append(generate_ran_x2())
+        generation0.append(gen_ran_x[1]())
     return generation0
 
 def initialize2(n): # Funkcja tworząca generacje chromosomów w sposób losowy
 	generation0 = []
 	a = int(n/2)
 	for i in range(a):
-		generation0.append(generate_ran_x3())
+		generation0.append(gen_ran_x[2]())
 	for j in range(n-a):
-		generation0.append(generate_ran_x2())
+		generation0.append(gen_ran_x[1]())
 	return generation0
 
 def initialize_with_0(n):
@@ -383,12 +397,14 @@ def index_list(population_n): # Funkcja obliczająca F(x) populacji i zapisując
 			Fx_ind = []
 		return Fx1
 
+
 def sort_index(population_n): # Funkcja sortująca indeksy chromosomów od tych odpowidających najmniejszemu F(x)
 	# do odpowiadających F(x) największemu		population_n = population[n]
 	# Fx_sorted: [[indeks_best, Fx_best][indeks_second_best, Fx_second_best]...]
 
-	Fx_sorted = sorted(index_list(population_n), key = itemgetter(1))
+	Fx_sorted = sorted(index_list(population_n), key=itemgetter(1))
 	return Fx_sorted
+
 
 def merge_index(Fx1, Fx2):
 	for i in range(len(Fx1)): # Dodaje drugi index o wartości 0 jezeli chromosom ze zbioru podstawowego
@@ -470,43 +486,48 @@ x_test2 = [[0, 0, 3], [0, 4, 0], [5, 0], [0, 2, 0], [0, 0, 3], [0, 0, 4]]
 # ---------------------- MAIN ------------------
 global mut_rate
 
-# ------------------ STEROWANIE ----------------------
-population_size = 100 # Liczba chromosów w populacji
-M = 8 #szansa na zmutowanie chromosomu: 1/M
-mut_rate = 8 #szansa na zmutowanie każdego genu w mutowanym chromosomie
-#k_param = 0.8 # stosunek ilości potomków do wielkości populacji    K_wykl = k_param * population_size
-K = 40 # Ilość potomków populacji = K * 2
-F_stb_max = 10 # Ile iteracji bez poprawy Fx_min się wykona przed zakończeniem pętli
+# ------------------ CONTROL PANEL ----------------------
+population_size = 100  # Number of chromosomes in population
+M = 8  # 1/M - chance for chromosome to be mutated
+mut_rate = 8  # 1/mut_rate - chance for gene mutation in mutating chromosome
+# k_param = 0.8 #  descendant number to population size ratio - K = k_param * population_size
+# K = int(k_param*population_size/2) # transformation of k_param to K (Number of population descendants)
+K = 40  # Number of population descendants = K * 2
+F_stb_max = 10  # max number of iterations without improvement - end condition
 # ------------------------------------------------------
 
-population = []		# population[x] - generacja x
+""" 
+Fx - OBJECTIVE FUNCTION
+Fx is maximum overload of a link
+The objective is to minimize it
+"""
+population = []		# population[x] - generation x
 n = 0
-#print("POPULACJA", n)
 population.append(initialize2(population_size))
-#K = int(k_param*population_size/2) # dostosowanie zmiennej stosunku liczby potomków do programu
 F_best = []
 Fx_n = sort_index(population[n])
-#print(Fx_n)
-Fx_0_max = Fx_n[-1][1] # Fx najgorszego chromosomu
+Fx_0_max = Fx_n[-1][1] # Fx of the worst chromosome
 worst_index = Fx_n[-1][0]
 Fx_0_min = Fx_n[0][1]
 F_best.append(Fx_0_min)
-#print("Wygenerowana losowo populacja 0:")
-#display_sorted_chromosomes(population[n], Fx_n)
-#print("F(x) najlepszego chromosomu populacji:", 	F_best[n])
-#input("Press Enter to continue...")
-#print("\n\n\n")
 
-F_stb_cnt = 0 # Stability counter - Ilość iteracji bez zmiany Fx_min
-
-#print(population[n][0]) # To nie jest najlepszy chromosom w populacji!
+"""
+TESTING
+print("Randomly generated population 0:")
+display_sorted_chromosomes(population[n], Fx_n)
+print("F(x) of the best chromosome of population:", 	F_best[n])
+input("Press Enter to continue...")
+print("\n\n\n")
+"""
+F_stb_cnt = 0 # Stability counter - Number of iteration without Fx_min improvement
 
 while F_stb_cnt < F_stb_max: 
 
 
-	setOx = [] # zbiór O(x)
+	setOx = [] # Set O(x)
 
-	'''# Crossover - Queen of the Bees
+	'''
+	# Crossover - Queen of the Bees
 	for j in range(K): 
 		for k in range(2):
 			setOx.append(generate_x_of_0) # należy dodać dwa chromosomy, którym przypisze się potem potomków
@@ -514,10 +535,10 @@ while F_stb_cnt < F_stb_max:
 		while population[n][Fx_n[0][0]] == population[n][Fx_n[r1][0]]: # Unikniecie sytuacji w której chromosom skrzyżuje się ze swoim bliźniakiem 
 			#POTENCJALNIE NIEBEZPIECZNE - Czy można porównywać w ten sposoób dwuwymiarowe listy?
 			r1 = random.randrange(1, population_size)
-		setOx[2*j], setOx[2*j+1] = crossover(population[n][Fx_n[0][0]], population[n][Fx_n[r1][0]]) # Queen of the bees - Krzyżuje się najlepszy chromosom
-		# z chromosomem losowo do niego dobranym
+		setOx[2*j], setOx[2*j+1] = crossover(population[n][Fx_n[0][0]], population[n][Fx_n[r1][0]])
+		# Queen of the bees - Krzyżuje się najlepszy chromosom z chromosomem losowo do niego dobranym
 	'''
-	# Crossover - prawdopodobieństwo oparte na funkcji celu v1
+	# Crossover v2 - Probability based on objective function
 	#'''
 	Z_vec0 = [] # wektor znormalizowanych funkcji celu 
 	for i in range(population_size):
@@ -614,8 +635,8 @@ for i in range(n):
 	print("Populacja", i + 1, ":          F(x): ", F_best[i])
 	
 
-print("Czas wykonania: {:.2f}s".format(time.time() - start_time))
-print("Funkcja crossover została wykonan {} razy.".format(crossover.cnt))
+print("Solving time: {:.2f}s".format(time.time() - start_time))
+print("Function crossover was executed {} times.".format(crossover.cnt))
 
 
 
