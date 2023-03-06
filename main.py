@@ -5,7 +5,7 @@ import time
 
 def func_timer(func):
 	"""
-	Measure duration of function
+	decorator - measure duration of function
 
 	:param func: function that we want to time every time its executed
 	:return: function with a timing mechanism
@@ -21,7 +21,7 @@ def func_timer(func):
 
 def func_counter(func):
 	"""
-	count number of times function was used
+	decorator - count number of times function was used
 
 	:param func: function which number of executions we want to know
 	:return: function with counting mechanism
@@ -39,8 +39,8 @@ def read_file(file_name):
 	transform file lines into list of strings and remove redundant contents of generated list (like comments,
 	empty lines, spaces)
 
-	:param file_name: string
-	:return: str_of_nums_list
+	:param file_name: string - directory path to network data file
+	:return str_of_nums_list: list of strings
 	"""
 
 	lines = []
@@ -57,11 +57,11 @@ def read_file(file_name):
 @func_timer
 def rm_empty_str(lst):
 	"""
-	removing empty strings from list, that came from empty lines in doc
+	remove empty strings from list, that came from empty lines in doc
 
-	params: lst (list)
+	params lst: list
 
-	returns: l (list)
+	returns l: list
 	"""
 
 	while "" in lst:
@@ -71,13 +71,13 @@ def rm_empty_str(lst):
 
 def separate(table, i, j):
 	"""
-	extracting numbers from strings and change it to integers
+	extract numbers from strings and change it to integers
 
-	:param table:
-	:param i:
-	:param j:
-	:return c:
-	:return j:
+	:param table: list of strings
+	:param i: positional index1
+	:param j: positional index2
+	:return c: int - value as integer
+	:return j: int - position in list
 	"""
 	c = table[i][j]
 	while j + 1 < len(table[i]) and table[i][j + 1] != ' ':
@@ -90,11 +90,11 @@ def separate(table, i, j):
 
 def parse_to_array(all_values_from_file):
 	"""
-	transforming list of strings of numbers into list of list that contain numbers, which were part of those strings
+	transform list of strings of numbers into list of list that contain numbers, which were part of those strings
 
-	Params: all_values_from_file (list of strings)
+	:param all_values_from_file: list of strings
 
-	Returns: items (list of lists)
+	:return items: list of lists of integers
 	"""
 	items = []
 	vect = []
@@ -118,9 +118,9 @@ def parse_to_array(all_values_from_file):
 
 def generate_tables(rr):
 	"""
-	Generating tables of ordered data to global scope
+	getting necessary data and assigning it to global scope variables
 
-	:param rr:
+	:param rr: list of lists of integers
 	:return:
 	"""
 
@@ -197,9 +197,7 @@ Global variables legend:
 
 def display():
 	"""
-	Displaying ordered data
-
-	:return Fx: int
+	Display global data
 	"""
 	print()
 	print("Link number E: %s" % E)
@@ -216,12 +214,13 @@ def display():
 
 	return
 
+
 def evaluate(x):
 	"""
-	Function calculating objection function of evaluated chromosome
+	calculate objection function of evaluated chromosome
 
-	:param x:
-	:return fx:
+	:param x: list of lists of integer - chromosome
+	:return fx: integer - objection function
 	"""
 	load = []  # load of a link n+1 l(e,x)
 	for i in range(E):
@@ -231,7 +230,7 @@ def evaluate(x):
 				for l in all_links[j][k]:
 					if i+1 == l:
 						load[i] += x[j][k]
-	y = [] # Overload
+	y = []  # Overload
 	for i in range (E):
 		y.append(load[i] - Ce[i])
 
@@ -241,10 +240,10 @@ def evaluate(x):
 
 def random_number(z):
 	"""
-	generate random number from range [0 - z]
+	generate random number within a range [0 - z]
 
-	:param z:
-	:return x:
+	:param z: integer - max value of random number
+	:return x: integer - random number
 	"""
 
 	x = random.randrange(0, z+1)
@@ -254,8 +253,10 @@ def random_number(z):
 def generate_ran_x1():
 	"""
 	generate random chromosome 1
+	capacity c1 of first path is drawn from range [0,  hd] next range is [0, hd - c1], next [0, hd - c1 -c2] etc
+	note: favours high capacity on first path
 
-	:return x: list of lists
+	:return x: list of lists of integers - random chromosome
 	"""
 	x = []
 	y = []
@@ -276,8 +277,10 @@ def generate_ran_x1():
 def generate_ran_x2():
 	"""
 	generate random chromosome 2
+	For every demand one of its paths is drawn and (capacity) is incremented by 1
+	Process is repeated hd(demand) times.
 
-	:return x:
+	:return x: list of lists of integers - random chromosome
 	"""
 	x = []
 	y = []
@@ -295,8 +298,10 @@ def generate_ran_x2():
 def generate_ran_x3():
 	"""
 	generate random chromosome 3
+	similar to "generate_ran_x3"
+	difference: starting path is drawn
 
-	:return x:
+	:return x: list of lists of integers - random chromosome
 	"""
 	x = []
 	y = []
@@ -324,7 +329,7 @@ def generate_x_of_0():
 	"""
 	generate chromosome of 0s
 
-	:return:
+	:return x: list of lists of integers
 	"""
 	x = []
 	y = []
@@ -338,10 +343,11 @@ def generate_x_of_0():
 
 def initialize(n):
 	"""
-	generate random population
+	generate random population 1
+	chromosomes generated with generate_ran_x2
 
-	:param n:
-	:return generation0:
+	:param n: integer number of chromosomes in population
+	:return generation0: list of lists of lists of integers
 	"""
 	generation0 = []
 	for i in range(n):
@@ -351,10 +357,11 @@ def initialize(n):
 
 def initialize2(n):
 	"""
-	generate random population
+	generate random population 2
+	chromosomes generated in two halves: with generate_ran_x2 and generate_ran_x3
 
-	:param n:
-	:return generation0:
+	:param n: integer number of chromosomes in population
+	:return generation0: list of lists of lists of integers
 	"""
 	generation0 = []
 	a = int(n/2)
@@ -369,8 +376,8 @@ def initialize_with_0(n):
 	"""
 	generate population of 0 chromosomes
 
-	:param n:
-	:return:
+	:param n: integer number of chromosomes in population
+	:return generation: list of lists of lists of integers
 	"""
 	generation = []
 	for i in range(n):
@@ -383,10 +390,10 @@ def crossover(p1, p2):
 	"""
 	create two chromosomes with genes randomly drawn from its parents (arguments)
 
-	:param p1:
-	:param p2:
-	:return o1:
-	:return o1:
+	:param p1: list of lists of integers - parent chromosome 1
+	:param p2: list of lists of integers - parent chromosome 1
+	:return o1: list of lists of integers - child chromosome 1
+	:return o2:list of lists of integers - child chromosome 1
 	"""
 	o1 = []
 	o2 = []
@@ -408,9 +415,10 @@ def crossover(p1, p2):
 
 def mutate(x):
 	"""
+	mutation of chromosome nr1
+	draw a random gene from a chromosome, subtract 1 from one path and add it to another
 
-
-	:param x:
+	:param x: list of lists of integers - mutating chromosome
 	:return:
 	"""
 	i = random.randrange(D)
@@ -430,9 +438,9 @@ def mutate(x):
 
 def mutate2(x):
 	"""
-	Generate random chromosome in place of randomly chosen existing one
+	Generate random gene in place of randomly chosen existing one
 
-	:param x:
+	:param x:  list of lists of integers - mutating chromosome
 	:return:
 	"""
 	i = random.randrange(D)
@@ -447,10 +455,9 @@ def mutate2(x):
 
 def mutate22(x):
 	"""
-	Generate random chromosome in place of randomly chosen existing one
+	For every gene there is 1/mut_rate chance of generating random chromosome in place of existing one
 
-
-	:param x:
+	:param x: list of lists of integers - mutating chromosome
 	:return:
 	"""
 	x_rand = gen_ran_x[1]()
@@ -465,14 +472,16 @@ def mutate22(x):
 	return
 
 
-def index_list(population_n): # Funkcja obliczająca F(x) populacji i zapisująca indeks
+def index_list(population_n):
 	"""
-	Generate list of Fx for chromosomes of population, sort it and assign indexes NOT OPTIMAL
+	Generate list of Fx for chromosomes of population, sort it and assign indexes
+	(NOT OPTIMAL - enumerate?)
 
-	:param population_n:
-	:return Fx1:
+	:param population_n: list of lists of lists of integers
+	:return Fx1: list of lists of integers (why not tuples?)
+	[number of chromosome in population][0 - index, 1 - Fx]
 	"""
-	Fx1 = [] # [number of chromosome in population][0 - index, 1 - Fx]
+	Fx1 = []
 	Fx_ind = []
 	for i in range(len(population_n)):
 		Fx_ind.append(i)  # index assignment
@@ -486,17 +495,18 @@ def sort_index(population_n):
 	"""
 	sort pairs Fx-index by Fx
 
-	:param population_n:
-	:return:
+	:param population_n: list of lists of lists of integers
+	:return Fx_sorted: list of lists of integers
+	Fx_sorted: [[index_best, Fx_best][index_second_best, Fx_second_best]...]
 	"""
 	Fx_sorted = sorted(index_list(population_n), key=itemgetter(1))
-	# Fx_sorted: [[index_best, Fx_best][index_second_best, Fx_second_best]...]
 	return Fx_sorted
 
 
 def merge_index(Fx1, Fx2):
 	"""
-
+	Add second index to every value-index pair to keep information about set origin
+	merge two sets sort it and keep only the best chromosomes (number of population size)
 
 	:param Fx1:
 	:param Fx2:
@@ -515,11 +525,12 @@ def merge_index(Fx1, Fx2):
 
 	return Fx_merged
 
+
 def display_chromosomes(list_of_x):
 	"""
-	display chromosomes
+	print values of objection function of chromosomes
 
-	:param list_of_x:
+	:param list_of_x: list of integers
 	:return:
 	"""
 	for s in range(len(list_of_x)):
@@ -543,39 +554,20 @@ def display_sorted_chromosomes(population_n, Fx):
 	
 
 def present_chromosome(x):
-    """
-    present chromosome in readable way
+	"""
+	present chromosome in readable way with consideration of 2 digit values
 
-    :param x:
-    :return:
-    """
-    print()
-    for i in range(max(p_cnt)):
-        for j in range(D):
-            try:
-                print("   ", x[j][i], "     ", end = "")
-            except IndexError:
-                print("    -      ", end = "")
-                #x[j][i] = '-'
-            #continue
-        print("\n\n")
-
-
-def present_chromosome2(x):
-    """
-    present chromosome in readable way v2
-
-    :param x:
-    :return:
-    """
-    print()
-    for i in range(max(p_cnt)):
-        for j in range(D):
-            try:
-                print("", x[j][i], end = "")
-            except IndexError:
-                print(" -", end = "")
-        print("\n\n")
+	:param x:
+	:return:
+	"""
+	print()
+	for i in range(max(p_cnt)):
+		for j in range(D):
+			try:
+				print("", x[j][i], end = "")
+			except IndexError:
+				print(" -", end = "")
+		print("\n\n")
 
 
 start_time = time.time()
@@ -584,9 +576,8 @@ lines_from_file = read_file("network_files/OPT-1_net4.txt")
 
 rr = parse_to_array(lines_from_file)
 generate_tables(rr)
-
-# ---------------------- MAIN ------------------
 global mut_rate
+
 
 # ------------------ CONTROL PANEL ----------------------
 population_size = 100  # Number of chromosomes in population
@@ -621,12 +612,11 @@ print("F(x) of the best chromosome of population:", 	F_best[n])
 input("Press Enter to continue...")
 print("\n\n\n")
 """
-F_stb_cnt = 0 # Stability counter - Number of iteration without Fx_min improvement
+F_stb_cnt = 0  # Stability counter - Number of iteration without Fx_min improvement
 
 while F_stb_cnt < F_stb_max: 
 
-
-	setOx = [] # Set O(x)
+	setOx = []  # Set O(x) - ascendants
 
 	'''
 	# Crossover: Queen of the Bees - Best chromosome crosses with random one
@@ -640,7 +630,6 @@ while F_stb_cnt < F_stb_max:
 	
 	'''
 	# Crossover v2 - Probability based on objective function
-	#'''
 	Z_vec0 = []  # vector of normalized objective function values
 	for i in range(population_size):
 		Z_vec0.append(abs(Fx_n[i][1] - Fx_n[-1][1]) + 1)
@@ -689,13 +678,13 @@ while F_stb_cnt < F_stb_max:
 
 
 print("\nWorst chromosome received:")
-present_chromosome2(population[0][worst_index])
+present_chromosome(population[0][worst_index])
 print()
 print("F(x) of worst chromosome of population:	", Fx_0_max)
 print("\n\n")
 
 print("Best chromosome received:")
-present_chromosome2(population[n][0])
+present_chromosome(population[n][0])
 print()
 print("F(x) of best chromosome:	", F_best[n])
 print("\n\n")
