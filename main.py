@@ -260,7 +260,7 @@ def generate_ran_x1():
 	x = []
 	y = []
 	for i in range(D):
-		hd_used = 0 # Demand used on previous paths
+		hd_used = 0  # Demand used on previous paths
 		for j in range(p_cnt[i]):
 			if j == p_cnt[i] - 1:
 				y.append(hd[i] - hd_used)
@@ -393,15 +393,15 @@ def crossover(p1, p2):
 	for i in range(D):
 		r1 = random_number(1)
 		r2 = random_number(1)
-	if r1 == 0:
-		o1.append(p1[i])
-	else:
-		o1.append(p2[i])
+		if r1 == 0:
+			o1.append(p1[i])
+		else:
+			o1.append(p2[i])
 
-	if r2 == 0:
-		o2.append(p1[i])
-	else:
-		o2.append(p2[i])
+		if r2 == 0:
+			o2.append(p1[i])
+		else:
+			o2.append(p2[i])
 
 	return o1, o2
 
@@ -453,14 +453,14 @@ def mutate22(x):
 	:param x:
 	:return:
 	"""
-	x_rand = generate_ran_x2()	
+	x_rand = gen_ran_x[1]()
 	for i in range(D):
 		r_mut_gen = random.randrange(mut_rate)
 		if r_mut_gen == 0:
 			while x_rand[i] == x[i]:
 				if p_cnt[i] == 1:
 					break
-				x_rand = generate_ran_x2()
+				x_rand = gen_ran_x[1]()
 			x[i] = x_rand[i]
 	return
 
@@ -578,9 +578,8 @@ def present_chromosome2(x):
         print("\n\n")
 
 
-
 start_time = time.time()
-lines_from_file = read_file("network_files/net12_2_for_python_1.txt")
+lines_from_file = read_file("network_files/OPT-1_net4.txt")
 # r = [*filter(None, lines_from_file)]
 
 rr = parse_to_array(lines_from_file)
@@ -674,55 +673,35 @@ while F_stb_cnt < F_stb_max:
 	population.append(initialize_with_0(population_size))
 	for i in range(population_size):  # Next population is created based on received index list
 		if Fx_merged[i][2] == 0:
-			population[n][i]=population[n-1][Fx_merged[i][0]]
+			population[n][i] = population[n-1][Fx_merged[i][0]]
 		else:
-			population[n][i]=setOx[Fx_merged[i][0]]
+			population[n][i] = setOx[Fx_merged[i][0]]
 	Fx_n = sort_index(population[n])
-
-
-	#print("Fx_n_sorted:	", Fx_n_unsorted)
-	#Fx_test=sort_index(population[n])
-	#print()
-	#print("P(n+1):		", Fx_test)
-	#print()
-
-	#print()
-	#print("POPULACJA", n)
-	#print("Posortowane chromosomy populacji", str(n) + ":")
-	#display_sorted_chromosomes(population[n], Fx_n)
-	#print("F(x) najlepszego chromosomu populacji:	", F_best[n])
 	
 	if F_best[n] < F_best[n-1]:
 		F_stb_cnt = 0
 	elif F_best[n] == F_best[n-1]:
 		F_stb_cnt += 1
 	else:
-		print("POPULACJA ZDEEWOLUOWAŁA!")
+		print("POPULATION REGRESSED!!!")  # Shouldn't happen, helpful to find mistakes in code
 		F_stb_cnt = 0
 		#break
 
 
-	#input("Press Enter to continue...")
-	#print(population[n][0])
-	
-
-	#input("Press Enter to continue...")
-	#print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-
-print("Najgorszy uzyskany chromosom:\n")
+print("\nWorst chromosome received:")
 present_chromosome2(population[0][worst_index])
 print()
-print("F(x) najgorszego chromosomu populacji:	", Fx_0_max)
+print("F(x) of worst chromosome of population:	", Fx_0_max)
 print("\n\n")
 
-print("Najlepszy uzyskany chromosom:\n")
+print("Best chromosome received:")
 present_chromosome2(population[n][0])
 print()
-print("F(x) najlepszego chromosomu populacji:	", F_best[n])
+print("F(x) of best chromosome:	", F_best[n])
 print("\n\n")
 
 for i in range(n):
-	print("Populacja", i + 1, ":          F(x): ", F_best[i])
+	print("Population", i + 1, ":          F(x): ", F_best[i])
 	
 
 print("Solving time: {:.2f}s".format(time.time() - start_time))
