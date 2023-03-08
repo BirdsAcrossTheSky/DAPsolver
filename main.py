@@ -1,6 +1,7 @@
 import random
 from operator import itemgetter
 import time
+from functools import wraps
 
 
 def func_timer(func):
@@ -10,11 +11,12 @@ def func_timer(func):
 	:param func: function that we want to time every time its executed
 	:return: function with a timing mechanism
 	"""
+	@wraps(func)
 	def wrapper(*args, **kwargs):
 		t0 = time.time()
 		rslt = func(*args, **kwargs)
 		t = time.time() - t0
-		print("Duration of {} was {}s.".format(func.__name__, t))
+		print("Duration of {} function was {}s.".format(func.__name__, t))
 		return rslt
 	return wrapper
 
@@ -26,6 +28,7 @@ def func_counter(func):
 	:param func: function which number of executions we want to know
 	:return: function with counting mechanism
 	"""
+	@wraps(func)
 	def wrapper(*args, **kwargs):
 		wrapper.cnt += 1
 		return func(*args, **kwargs)
@@ -571,7 +574,7 @@ def present_chromosome(x):
 
 
 start_time = time.time()
-lines_from_file = read_file("network_files/OPT-1_net4.txt")
+lines_from_file = read_file("network_files/net12_2_for_python_3.txt")
 # r = [*filter(None, lines_from_file)]
 
 rr = parse_to_array(lines_from_file)
